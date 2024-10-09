@@ -3,103 +3,182 @@
 #include <cstdlib>
 #include <ctime>
 
-enum gameCondition {
-    playerWin = 0,
-    playerLose = 1,
+enum gameStatus {
+    win = 1,
+    lose = 2,
     tie = 3
 };
 
-static bool isGameDone(std::string board[], const int &r_boardSize) {
-    return true;
-}
-
-static void displayBoard(std::string board[], const int &r_boardSize) {
+void displayBoard(char *spaces) {
     for (int i = 0; i < 9; i++) {
-        std::cout << " " << board[i] << " | ";
-        if (i == 2 || i == 5)
-            std::cout << "\n---|----|---|\n";
+        if (i == 0 || i == 3 || i == 6)
+            std::cout << "| ";
+        std::cout << spaces[i] << " | ";
+        if (i == 2 || i == 5)  {
+            std::cout << '\n';
+            std::cout << "|---|---|---|";
+            std::cout << '\n';
+        }
     }
     std::cout << '\n';
 }
 
-static void makeMove(const bool &r_IsPlayer, const int rowColumn[], const char &r_input, std::string board[]) {
-    const char validInput = r_IsPlayer ? 'X' : 'O';
+void computerMove(char *spaces, const char &r_computer) {
+    bool loop = true;
+    int number;
+    std::srand(static_cast<unsigned int>(std::time(0)));
+    do {
+        number = std::rand() % 9;
 
+        if (spaces[number] == ' ') {
+            spaces[number] = r_computer;
+            loop = false;
+        }
+    } while (loop);
 }
 
-static void inputMove(const bool &r_IsPlayer, std::string board[]) {
-    const char validInput = r_IsPlayer ? 'X' : 'O';
-    bool isValidInput = false;
-    int rowColumnInput;
-    while (!isValidInput) {
-        std::cout << "Input #: ";
-        std::cin >> rowColumnInput;
+bool checkWinner (const char *spaces, gameStatus &r_status, const char &r_player, const char &r_computer) {
+    bool tieStatus = true;
+    for (int i = 0; i < 9; i++) {
+        if (spaces[i] == ' ')
+            tieStatus = false;
+    }
+
+    if (tieStatus) {
+        r_status = tie;
+        return false;
+    } else {
+        if ((spaces[0] == r_player && spaces[1] == r_player && spaces[2] == r_player) || 
+            (spaces[3] == r_player && spaces[4] == r_player && spaces[5] == r_player) ||
+            (spaces[6] == r_player && spaces[7] == r_player && spaces[8] == r_player) ||
+            (spaces[0] == r_player && spaces[3] == r_player && spaces[6] == r_player) ||
+            (spaces[1] == r_player && spaces[4] == r_player && spaces[7] == r_player) ||
+            (spaces[2] == r_player && spaces[5] == r_player && spaces[8] == r_player) ||
+            (spaces[0] == r_player && spaces[4] == r_player && spaces[8] == r_player) ||
+            (spaces[2] == r_player && spaces[4] == r_player && spaces[6] == r_player) ) {
+            r_status = win;
+            return false;
+        } else if ((spaces[0] == r_computer && spaces[1] == r_computer && spaces[2] == r_computer) || 
+            (spaces[3] == r_computer && spaces[4] == r_computer && spaces[5] == r_computer) ||
+            (spaces[6] == r_computer && spaces[7] == r_computer && spaces[8] == r_computer) ||
+            (spaces[0] == r_computer && spaces[3] == r_computer && spaces[6] == r_computer) ||
+            (spaces[1] == r_computer && spaces[4] == r_computer && spaces[7] == r_computer) ||
+            (spaces[2] == r_computer && spaces[5] == r_computer && spaces[8] == r_computer) ||
+            (spaces[0] == r_computer && spaces[4] == r_computer && spaces[8] == r_computer) ||
+            (spaces[2] == r_computer && spaces[4] == r_computer && spaces[6] == r_computer) ) {
+            r_status = lose;
+            return false;
+        }
+    }
+    return true;
+}
+
+void playerMove(char *spaces, char &r_player) {
+    bool loop = true;
+    int number;
+
+    do {
+        std::cout << "Number to place " << r_player << " (1-9): ";
+        std::cin >> number;
+
         if (std::cin.fail()) {
             std::cin.clear();
             std::cin.ignore(99999, '\n');
-            std::cout << "Invalid input. Please enter number only." << '\n';
-        } else if (rowColumnInput > 9 || rowColumnInput < 1) {
-            std::cout << "Please input from 1-9 only." << '\n';
+            std::cout << "Please input 1-9 only." << '\n';
+        } else if (number > 9 || number < 1) {
+            std::cout << "Invalid input." << '\n';
         } else {
-            board[rowColumnInput] = validInput;
-            isValidInput = true;
+            number--;
+            if (spaces[number] == ' ') {
+                spaces[number] = r_player;
+                loop = false;
+            } else {
+                std::cout << "Space already occupied." << '\n';
+            }
         }
+    } while (loop);
+}
+
+void printOutcome(const gameStatus &r_gameStatus) {
+    switch (r_gameStatus)
+    {
+    case tie:
+        std::cout << "\n\nIt's a tie!\n\n";
+        break;
+    case win:
+        std::cout << "\n\nYou win!\n\n";
+        break;
+    case lose:
+        std::cout << "\n\nYou lose!\n\n";
+        break;
     }
 }
 
-static bool equalsIgnoreCase(const char &r_input, const char &r_reference) {
-    return std::tolower(r_input) == std::tolower(r_reference);
-}
-
-static int generateRandomNumber(const int &r_min, const int &r_max) {
-    bool isSeeded = false;
-    if (!isSeeded) {
-        std::srand(static_cast<unsigned int>(std::time(0)));
-        isSeeded = true;
-    }
-    return r_min + (std::rand() % (r_max - r_min + 1));
-}
-
-static void render() {
-    int whoFirst = generateRandomNumber(1, 2);
-    std::string board[9] = {"1", "2", "3", "4", "5", "6", "7", "8", "9"};
-    bool finish = false;
-    int turn = 0;
-    int gameCondition;
-    bool isPlayerFirst = (whoFirst == 0); 
+void gameLoop(char &r_player) {
+    char computer = r_player == 'X' ? 'O' : 'X';
+    char spaces[9] = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
+    bool isPlaying = true;
+    gameStatus status;;
 
     do {
-        displayBoard(board, std::size(board));
-        
-        if (turn % 2 == 0) {
-            inputMove(!isPlayerFirst, board);
-        } else { // Computer's turn
-            inputMove(isPlayerFirst, board);
-        }
+        displayBoard(spaces);
+        playerMove(spaces, r_player);
+        isPlaying = checkWinner(spaces, status, r_player, computer);
 
-        finish = isGameDone(board, std::size(board));
-        turn++;
-    } while (!finish);
+        if (!isPlaying)
+            break;
+
+        computerMove(spaces, computer);
+        isPlaying = checkWinner(spaces, status, r_player, computer);
+    } while (isPlaying);
+
+    displayBoard(spaces);
+    printOutcome(status);
+}
+
+char askForXO() {
+    char player;
+    bool loop = true;
+    while (loop) {
+        std::cout << "Do you want to play X or O? [X/O]: ";
+        std::cin >> player;
+
+        if (std::cin.fail()) {
+            std::cin.clear();
+            std::cin.ignore(99999, '\n');
+        } else if ('X' == std::toupper(player) || 'O' == std::toupper(player)) {
+            return std::toupper(player);
+        } else {
+            std::cout << "Invalid input." << '\n';
+        }
+    }
+
+    return 'X';
+}
+
+void start() {
+    std::cout << "Tic tac toe!" << '\n';
+    char input;
+    bool playing = true;
+    while (playing) {
+        std::cout << "Do you want to play? [Y/N]: ";
+        std::cin >> input;
+
+        if (std::cin.fail()) {
+            std::cin.clear();
+            std::cin.ignore(99999, '\n');
+        } else if (std::tolower(input) == 'y') {
+            char player = askForXO();
+            gameLoop(player);
+        } else if (std::tolower(input) == 'n') {
+            playing = false;
+        } else {
+            std::cout << "Invalid input." << '\n';
+        }
+    }
 }
 
 void driverTictactoe() {
-    std::cout << "Tic-Tac-Toe" << '\n';
-
-    char input;
-    bool isPlaying = true;
-    do {
-        std::cout << "Would you like to play? [Y/N]: ";
-        std::cin >> input;
-
-        if (equalsIgnoreCase(input, 'Y')) {
-            render();
-        } else if (equalsIgnoreCase(input, 'N')) {
-            std::cout << "See you next time!" << '\n';
-            isPlaying = false;
-        } else {
-            std::cout << "Invalid input!" << '\n';
-            std::cin.clear();
-            std::cin.ignore(9999999, '\n');
-        }
-    } while (isPlaying);
+    start();
+    std::cout << "Thank you for playing!" << '\n';
 }
