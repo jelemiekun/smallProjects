@@ -229,7 +229,7 @@ void listItems() {
 
     for (int i = 0; i < sItemListSize; i++) {
         if (sItemList[i].mItemID != -1) {
-            std::cout << i + 1 << ". " << sItemList[i].mItemName << " - " << &sItemList[i] << '\n';
+            std::cout << i + 1 << ". " << sItemList[i].mItemName << " - " << sItemList[i].mItemID << '\n';
         }
     }
 
