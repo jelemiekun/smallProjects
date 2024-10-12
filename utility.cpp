@@ -262,7 +262,7 @@ void checkReorderItems() {
     std::cout << "--------------------------------------------------\n";
 }
 
-void sortItemsByCategory() {
+void listItemsByCategory() {
     std::cout << "=== Sort Items By Category ===\n";
     std::cout << "--------------------------------------------------\n";
 
