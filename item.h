@@ -4,23 +4,28 @@
 #include <ctime>
 
 class Item {
-private:
-enum ItemCategory {
-    Groceries,
-    Furniture,
-    Electronics,
-    Office_supplies,
-    Clothing
-};
+public:
+    enum class ItemCategory {
+        Empty,
+        Groceries,
+        Furniture,
+        Electronics,
+        Office_supplies,
+        Clothing
+    };
 
-enum QuantityLevel {
-    empty = 0,
-    reorder = 5,
-    maximum = 20
-};
+    enum class QuantityLevel {
+        Empty = 0,
+        Reorder = 5,
+        Maximum = 20
+    };
 
 private:
-    static Item sItemList[100];
+    static const int MAXIMUM_ITEM = 250;
+    static Item sItemList[];
+    static int sItemListSize;
+    static int IDCounter;
+
     int mItemID;
     std::string mItemName;
     int mQuantity;
@@ -29,13 +34,15 @@ private:
     QuantityLevel mQuantityLevel;
     std::string mSupplierInformation;
 
-public:
-    Item(const int &rItemID, const std::string &rItemName, const int &rQuantity, const float &rPrice, 
-        const ItemCategory &rCategory, const std::string &rSupplierInformation) 
-        : mItemID(rItemID), mItemName(rItemName), mQuantity(rQuantity), mPrice(rPrice), mCategory(rCategory),
-        mSupplierInformation(rSupplierInformation) {
+private:
+    static int* findIndexOfItemToRemove(const int &rItemID);
+    static void removeSpecificItem(Item &rItem);
 
-        }
+public:
+    Item();
+
+    Item(const std::string &rItemName, const int &rQuantity, const float &rPrice, 
+        const ItemCategory &rCategory, const std::string &rSupplierInformation);
 
     static void addItem(const Item &rItem);
     static void removeItem(const int &rItemID);
@@ -50,6 +57,8 @@ public:
     static void generateInventoryStatusReport();
     static void generateInventoryRevenueReport();
     static void generateTotalReport();
+
+    int getID() const;
 };
 
 #endif
