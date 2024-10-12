@@ -224,14 +224,23 @@ void determineQuantityLevel(Item &rItem) {
 }
 
 void listItems() {
+    std::cout << "=== List Items ===\n";
+    std::cout << "--------------------------------------------------\n";
+
     for (int i = 0; i < sItemListSize; i++) {
         if (sItemList[i].mItemID != -1) {
             std::cout << i + 1 << ". " << sItemList[i].mItemName << " - " << &sItemList[i] << '\n';
         }
     }
+
+
+    std::cout << "--------------------------------------------------\n";
 }
 
 void checkReorderItems() {
+    std::cout << "=== Check Reorder Items ===\n";
+    std::cout << "--------------------------------------------------\n";
+
     std::cout << "Items that need to be reordered:\n";
     bool needReorder = false;
 
@@ -249,5 +258,99 @@ void checkReorderItems() {
     if (!needReorder) {
         std::cout << "All items are at sufficient quantity, no need to reorder.\n";
     }
+
+    std::cout << "--------------------------------------------------\n";
 }
 
+void sortItemsByCategory() {
+    std::cout << "=== Sort Items By Category ===\n";
+    std::cout << "--------------------------------------------------\n";
+
+    Item::ItemCategory categories[] = {
+        Item::ItemCategory::Clothing,
+        Item::ItemCategory::Electronics,
+        Item::ItemCategory::Furniture,
+        Item::ItemCategory::Groceries,
+        Item::ItemCategory::Office_supplies
+    };
+    const std::string categoryNames[] = {
+        "Clothing",
+        "Electronics",
+        "Furniture",
+        "Groceries",
+        "Office Supplies"
+    };
+
+    for (int j = 0; j < sizeof(categories) / sizeof(categories[0]); j++) {
+        std::cout << categoryNames[j] << ": " << '\n';
+        for (int i = 0; i < sItemListSize; i++) {
+            if (sItemList[i].mCategory == categories[j]) {
+                std::cout << i + 1 << ". " << sItemList[i].mItemName << '\n';
+            }
+        }
+    }
+
+    std::cout << "--------------------------------------------------\n";
+}
+
+void generateInventoryStatusReport() {
+    std::cout << "=== Inventory Status Report ===\n";
+    std::cout << "ID\tName\t\tQuantity\tPrice\tCategory\n";
+    std::cout << "--------------------------------------------------\n";
+
+    for (int i = 0; i < sItemListSize; i++) {
+        const Item &item = sItemList[i];
+        std::cout << item.mItemID << '\t' 
+                  << item.mItemName << '\t' 
+                  << item.mQuantity << '\t' 
+                  << item.mPrice << '\t' 
+                  << static_cast<int>(item.mCategory) << '\n'; 
+    }
+    std::cout << "--------------------------------------------------\n";
+}
+
+
+void generateInventoryRevenueReport() {
+    float totalRevenue = 0.0f;
+    std::cout << "=== Inventory Revenue Report ===\n";
+    std::cout << "ID\tName\t\tRevenue\n";
+    std::cout << "----------------------------------\n";
+
+    for (int i = 0; i < sItemListSize; i++) {
+        const Item &item = sItemList[i];
+        float revenue = item.mQuantity * item.mPrice;
+        std::cout << item.mItemID << '\t' 
+                  << item.mItemName << '\t' 
+                  << revenue << '\n';
+        totalRevenue += revenue;
+    }
+    std::cout << "----------------------------------\n";
+    std::cout << "Total Revenue: " << totalRevenue << '\n';
+}
+
+
+void generateTotalReport() {
+    int totalItems = 0;
+    float totalRevenue = 0.0F;
+    int categoryCounts[6] = {0};
+
+    for (int i = 0; i < sItemListSize; i++) {
+        const Item &item = sItemList[i];
+
+        if (item.mItemID != -1) {
+            totalItems++;
+            totalRevenue += item.mPrice;
+
+            categoryCounts[static_cast<int>(item.mCategory)] += 1;
+        }
+    }
+
+    std::cout << "=== Total Inventory Report ===\n";
+    std::cout << "Total Items in Inventory: " << totalItems << '\n';
+    std::cout << "Total Revenue: " << totalRevenue << '\n';
+    std::cout << "Items in Clothing: " << categoryCounts[static_cast<int>(Item::ItemCategory::Clothing)] << '\n';
+    std::cout << "Items in Electronics: " << categoryCounts[static_cast<int>(Item::ItemCategory::Electronics)] << '\n';
+    std::cout << "Items in Furniture: " << categoryCounts[static_cast<int>(Item::ItemCategory::Furniture)] << '\n';
+    std::cout << "Items in Groceries: " << categoryCounts[static_cast<int>(Item::ItemCategory::Groceries)] << '\n';
+    std::cout << "Items in Office Supplies: " << categoryCounts[static_cast<int>(Item::ItemCategory::Office_supplies)] << '\n';
+}
