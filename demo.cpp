@@ -1,39 +1,39 @@
 #include <iostream>
+#include <ctime>
 
-class Entity {
+class point {
 private:
-    std::string name;
+    clock_t timer ;
+
 public:
-    Entity() {
-        std::cout << "Entity created!";
+    point() {
+        std::cout << "timer starting..." << '\n';
+        timer = clock();
     }
 
-    ~Entity() {
-        std::cout << "Entity destroyed!";
+    ~point() {
+        clock_t end_time = clock();
+        double elapsed_time = static_cast<double>(end_time - timer) / CLOCKS_PER_SEC;
+        std::cout << "time elapsed: " << elapsed_time << '\n';
     }
-};
 
-class ScopedPtr {
-private:
-    Entity* e;
-public:
-    ScopedPtr(Entity* ePtr) : e(ePtr) {}
-
-    ~ScopedPtr() {
-        std::cout << "ScopedPtr deleted!";
-        delete e;
+    clock_t getTimer() const {
+        return timer;
     }
 };
 
 int main() {
-    {
-         ScopedPtr e = new Entity();
-    }
+    point* e = new point();
+    int i = 10;
 
-    int a = 50;
-    std::cout << '\n';
-    a = 50;
-    std::cout << a;
+    while (i > 0) {
+        clock_t current_time = clock();
+        if ((current_time - e->getTimer()) % 1000 == 0) {
+            std::cout << i << '\n';
+            i--;
+        }
+    }
+    delete e;
 
     return EXIT_SUCCESS;
 }
