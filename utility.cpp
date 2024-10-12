@@ -118,6 +118,37 @@ void updateItemPrice(const int &rItemID, const float &rNewPrice) {
     }
 }
 
+void searchItemByName(const std::string &rItemName) { 
+    bool found = false;
+
+    for (int i = 0; i < sItemListSize; i++) {
+        if (sItemList[i].mItemName.find(rItemName) != std::string::npos) {
+            std::cout << "Item found!\n";
+            std::cout << "Item ID: " << sItemList[i].mItemID << '\n';
+            found = true;
+        }
+    }
+
+    if (!found) {
+        std::cout << "No items found with the name: " << rItemName << '\n';
+    }
+}
+
+void searchItemByID(const int &rItemID) {
+    bool found = false;
+
+    for (int i = 0; i < sItemListSize; i++) {
+        if (sItemList[i].mItemID == rItemID) {
+            std::cout << "Item found!\n";
+            std::cout << "Item ID: " << sItemList[i].mItemID << '\n';
+            found = true;
+        }
+    }
+
+    if (!found) {
+        std::cout << "No items found with the ID: " << rItemID << '\n'; 
+    }
+}
 
 
 void getItemDetails(const int &rItemID) {
