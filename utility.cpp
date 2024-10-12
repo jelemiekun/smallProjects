@@ -152,7 +152,63 @@ void searchItemByID(const int &rItemID) {
 
 
 void getItemDetails(const int &rItemID) {
+    bool found = false;
 
+    for (int i = 0; i < sItemListSize; i++) {
+        if (sItemList[i].mItemID == rItemID) {
+            std::cout << "Item found!\n";
+            std::cout << "Item ID: " << sItemList[i].mItemID << '\n';
+            std::cout << "Item Name: " << sItemList[i].mItemName << '\n';
+            std::cout << "Quantity: " << sItemList[i].mQuantity << '\n';
+            std::cout << "Price: $" << sItemList[i].mPrice << '\n';
+            std::cout << "Category: ";
+            switch (sItemList[i].mCategory) {
+                case Item::ItemCategory::Groceries:
+                    std::cout << "Groceries\n";
+                    break;
+                case Item::ItemCategory::Furniture:
+                    std::cout << "Furniture\n";
+                    break;
+                case Item::ItemCategory::Electronics:
+                    std::cout << "Electronics\n";
+                    break;
+                case Item::ItemCategory::Office_supplies:
+                    std::cout << "Office Supplies\n";
+                    break;
+                case Item::ItemCategory::Clothing:
+                    std::cout << "Clothing\n";
+                    break;
+                default:
+                    std::cout << "Unknown Category\n";
+                    break;
+            }
+
+            std::cout << "Quantity Level: ";
+            switch (sItemList[i].mQuantityLevel) {
+                case Item::QuantityLevel::Empty:
+                    std::cout << "Empty\n";
+                    break;
+                case Item::QuantityLevel::Reorder:
+                    std::cout << "Reorder\n";
+                    break;
+                case Item::QuantityLevel::Maximum:
+                    std::cout << "Maximum\n";
+                    break;
+                default:
+                    std::cout << "Unknown Level\n";
+                    break;
+            }
+
+            std::cout << "Supplier Information: " << sItemList[i].mSupplierInformation << '\n';
+            found = true;
+            break;
+            found = true;
+        }
+    }
+
+    if (!found) {
+        std::cout << "No items found with the ID: " << rItemID << '\n'; 
+    }
 }
 
 void determineQuantityLevel(Item &rItem) {
@@ -174,3 +230,24 @@ void listItems() {
         }
     }
 }
+
+void checkReorderItems() {
+    std::cout << "Items that need to be reordered:\n";
+    bool needReorder = false;
+
+    for (int i = 0; i < sItemListSize; i++) {
+        if (sItemList[i].mQuantity <= static_cast<int>(Item::QuantityLevel::Reorder)) {
+            std::cout << "Item ID: " << sItemList[i].mItemID << '\n';
+            std::cout << "Item Name: " << sItemList[i].mItemName << '\n';
+            std::cout << "Current Quantity: " << sItemList[i].mQuantity << '\n';
+            std::cout << "Reorder Level: " << static_cast<int>(Item::QuantityLevel::Reorder) << '\n';
+            std::cout << "-----------------------------------\n";
+            needReorder = true;
+        }
+    }
+
+    if (!needReorder) {
+        std::cout << "All items are at sufficient quantity, no need to reorder.\n";
+    }
+}
+
