@@ -28,8 +28,9 @@ void addItem(const Item &rItem) {
     int quantityCounter = 0;
 
     for (int i = 0; i < sItemListSize; i++) {
-        if (sItemList[i].mItemID == -1) {
-            sItemList[i] = rItem;
+        if (sItemList[i].mItemID == -1) { // If index value in sItemList is -1, it's empty
+            sItemList[i] = rItem; // Fill the current index with the current Item
+            determineQuantityLevel(sItemList[i]);
             quantityCounter++;
         }
 
@@ -57,7 +58,7 @@ void removeItem(const int &rItemID) {
         }
     }
 
-    for (int i = 0; i < MAXIMUM_ITEM; i++) { // Itirate the loop.
+    for (int i = 0; i < MAXIMUM_ITEM; i++) { // Iterate the loop.
         if (sItemList[i].mItemID == -1) { // If current item ID is -1, find the next non-empty index and replace it.
             for (int j = i; j < MAXIMUM_ITEM; j++) { // Itierate the loop again to find the next non-empty index.
                 if (sItemList[j].mItemID != -1) { // If current item ID is NOT -1, it's not empty. Non-empty index found.
@@ -67,6 +68,71 @@ void removeItem(const int &rItemID) {
                 }
             }
         }
+    }
+}
+
+
+bool isUpdatingQuantityWillExceedLimit(const int &rNewQuantity) {
+    int size = 0;
+
+    for (const Item& item : sItemList) {
+        if (item.mItemID != -1) {
+            size++;
+        }
+    }
+
+    size += rNewQuantity;
+
+    return rNewQuantity > MAXIMUM_ITEM;
+}
+
+void updateItemQuantity(const int &rItemID, const int &rNewQuantity) {
+    if (rNewQuantity < 0) {
+        std::cout << "updateItemQuantity: Invalid quantity." << '\n';
+        return;
+    }
+    
+    if (isUpdatingQuantityWillExceedLimit(rNewQuantity)) {
+        std::cout << "updateIteQuantity: Adding new quantity will exceed limit." << '\n';
+        return;
+    }
+
+    for (int i = 0; i < sItemListSize; i++) {
+        if (sItemList[i].mItemID == rItemID) {
+            sItemList[i].mQuantity = rNewQuantity;
+            determineQuantityLevel(sItemList[i]);
+        }
+    }
+}
+
+void updateItemPrice(const int &rItemID, const float &rNewPrice) {
+    if (rNewPrice < 0) {
+        std::cout << "updateItemPrice: Invalid price." << '\n';
+        return;
+    }
+
+    for (int i = 0; i < sItemListSize; i++) {
+        if (sItemList[i].mItemID == rItemID) {
+            sItemList[i].mPrice = rNewPrice;
+        }
+    }
+}
+
+
+
+void getItemDetails(const int &rItemID) {
+
+}
+
+void determineQuantityLevel(Item &rItem) {
+    if (rItem.mQuantity == 0) {
+        rItem.mQuantityLevel = Item::QuantityLevel::Empty;
+    } else if (rItem.mQuantity <= static_cast<int>(Item::QuantityLevel::Reorder)) {
+        rItem.mQuantityLevel = Item::QuantityLevel::Reorder;
+    } else if (rItem.mQuantity >= static_cast<int>(Item::QuantityLevel::Maximum)) {
+        rItem.mQuantityLevel = Item::QuantityLevel::Maximum;
+    } else {
+        rItem.mQuantityLevel = Item::QuantityLevel::Empty;
     }
 }
 

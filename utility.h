@@ -12,15 +12,17 @@ extern int IDCounter;
 // private
 static int* findIndexOfItemToRemove(const int &rItemID);
 static void removeSpecificItem(Item &rItem);
+static bool isUpdatingQuantityWillExceedLimit(const int &rNewQuantity);
 
 // public
-void addItem(const Item &rItem);
+extern void addItem(const Item &rItem);
 void removeItem(const int &rItemID);
 void updateItemQuantity(const int &rItemID, const int &rNewQuantity);
-void updateItemPrice(const int &rItemID, const int &rNewPrice);
+void updateItemPrice(const int &rItemID, const float &rNewPrice);
 void searchItemByName(const std::string &rItemName);
 void searchItemByID(const int &rItemID);
 void getItemDetails(const int &rItemID);
+void determineQuantityLevel(Item &rItem);
 void listItems();
 void checkReorderItems();
 void sortItemsByCategory();
